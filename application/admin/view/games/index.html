@@ -1,0 +1,120 @@
+
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+		<span class="c-gray en">&gt;</span>
+		副本管理
+		<span class="c-gray en">&gt;</span>
+		副本列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a> </nav>
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<table class="table table-border table-bordered table-bg">
+				<thead>
+					<tr>
+						<th scope="col" colspan="16">副本列表</th>
+					</tr>
+					<tr class="text-c">
+							<th width="25"><input type="checkbox" name="" value=""></th>
+							<th width="30">ID</th>
+							<th width="800">副本分类</th>
+							<th>操作</th>
+						</tr>
+
+				</thead>
+				<tbody id="Huifold1" class="Huifold">
+
+					{foreach $games as $g}
+					<tr class="item">
+						<td class="text-c"><input type="checkbox" value="{$g.id}" name=""></td>
+						<td class="text-c">{$g.id}</td>
+						<td><h4 style="background: none;font-weight: 500;font-size: 12px;">★----- {$g.name} <b> + </b> </h4></td>
+						<td class="td-manage text-c">
+							<a title="编辑" href="javascript:;" onclick="admin_edit('副本编辑','{:url(\'admin/games/edit\',[\'id\'=>$g.id])}')" class="ml-5" style="text-decoration:none">
+							<i class="Hui-iconfont">&#xe6df;</i> </a>  
+							<a title="删除" href="javascript:;"  class="ml-5" style="text-decoration:none"> 
+							<i class="Hui-iconfont">&#xe6e2;</i> </a>
+						</td>
+					</tr>
+					{/foreach}
+				</tbody>
+			</table>
+		</article>
+	</div>
+</section>
+<!-- 分类列表结束 -->
+<!-- 脚部信息 -->
+
+<!-- 脚部信息结束 -->
+<script type="text/javascript">
+/*
+	参数解释：
+	title	标题
+	url		请求的url
+	id		需要操作的数据id
+	w		弹出层宽度（缺省调默认值）
+	h		弹出层高度（缺省调默认值）
+*/
+/*副本-编辑*/
+function admin_edit(title,url){
+
+	layer.open({
+      type: 2,
+      title: title,
+      area: ['600px', '360px'],
+      shadeClose: true, //点击遮罩关闭
+      content: url,
+    });
+}
+/*5个参数顺序不可打乱，分别是：相应区,隐藏显示的内容,速度,类型,事件*/
+
+jQuery.Huifold = function(obj,obj_c,speed,obj_type,Event){
+
+	$(obj).bind(Event,function(){
+		$(this).attr('class','selected');
+		var id = $(this).closest('tr').find('input:checkbox').val();
+		var that = $(this);
+		if( $('table').find('.info').is(':visible') ){
+			$(that).find("b").html("+");
+			$('table').find('.info').remove();
+			return;
+/*					// $(that).closest('tr').next().slideUp(speed).end().removeClass("selected");
+			$(that).closest('tr').find("b").html("+")*/
+		}		
+		/*发送ajax*/
+		$.ajax({
+			'url'	: "{:url('admin/AjaxApi/gameread')}",
+			'type'	: 'post',
+			'data'	: 'parent_id='+id,
+			'dataType'	: 'json',
+			'success'	: function(res){
+				if( res.code != 10000 ) return;
+				var data = res.data; //外层数组。里层是多个json对象
+				var html = '';
+				$(that).find("b").html("-");
+				$.each(data, function(i,v){					
+					html += '<tr class="info" parent_id="2">';
+					html += '<td class="text-c"><input type="checkbox" value="'+ v.id +'" name=""></td>';
+					html += '<td class="text-c">'+ v.id +'</td>';
+					html += '<td>---> '+ v.name +' ☆</td>';
+					html += '<td class="td-manage text-c">';
+					html += '<a title="编辑" href="javascript:;" onclick="admin_edit(\'副本编辑\',\"{:url(\'admin/games/edit\')}\?id="'+ v.id +')" class="ml-5" style="text-decoration:none">';
+					html += '<i class="Hui-iconfont">&#xe6df;</i> </a>';
+					html += '<a title="删除" href="javascript:;"  class="ml-5" style="text-decoration:none"> ';
+					html += '<i class="Hui-iconfont">&#xe6e2;</i> </a> ';
+					html += '</td>';
+					html += '</tr>';
+				});
+
+				$(that).closest('tr').after(html);
+			}
+		});
+	});
+}
+
+
+
+$(function(){
+	$.Huifold("#Huifold1 .item h4","#Huifold1 .info","fast",1,"click"); 
+
+});
+
+</script> 

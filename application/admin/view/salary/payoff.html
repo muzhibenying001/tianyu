@@ -1,0 +1,54 @@
+<section class="Hui-article-box">
+	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+		<span class="c-gray en">&gt;</span>
+		工资管理
+		<span class="c-gray en">&gt;</span>
+		发放记录 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a> </nav>
+	<div class="Hui-article">
+		<article class="cl pd-20">
+			<table class="table table-bordered table-bg">
+				<thead>
+					<tr class="table-border">
+						<th scope="col" colspan="16">工资发放记录</th>
+					</tr>
+					<tr class="text-c">
+							<th width="5%">ID</th>
+							<th width="20%">发放日期</th>
+							<th width="20%">成员</th>
+							<th width="15%">参数单子数</th>
+							<th width="15%">金额</th>
+							<th width="15%">发放人</th>
+						</tr>
+				</thead>
+				<tbody id="Huifold1" class="Huifold">
+					{foreach $info as $k=>$i}
+					<tr style="background: #eee;cursor: pointer;" onclick="showinfo(this,'{$k}');">
+						<th colspan="2">{$k}</th>
+						<th colspan="2">发放：{$i.count}人</th>
+						<th>发放总额：￥{$i.total}</th>
+						<th>点击查看详请</th>
+					</tr>
+						{foreach $i as $n => $p}
+							{if ($n !== 'count' && $n !== 'total')}
+							<tr style="display: none;" class="showinfo{$k}">
+								<td class="text-c">{$p.id}</td>
+								<td class="text-c">{$p.create_time}</td>
+								<td class="text-c">{$p.manager_name}</td>
+								<td class="text-c">{$p.sum_order}</td>
+								<td class="text-c">{$p.sum_salary}</td>
+								<td class="text-c">{$p.operator}</td>
+							</tr>
+							{/if}
+						{/foreach}
+					{/foreach}
+				</tbody>
+			</table>
+		</article>
+	</div>
+</section>
+
+<script type="text/javascript">
+	function showinfo(obj,i){
+		$('.showinfo'+i).toggle();
+	}
+</script>

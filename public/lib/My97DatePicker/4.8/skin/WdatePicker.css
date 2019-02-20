@@ -1,0 +1,29 @@
+.Wdate{
+	background:#fff url(datePicker.gif) no-repeat right;
+}
+.Wdate::-ms-clear{display:none;}
+
+.WdateFmtErr{
+	font-weight:bold;
+	color:red;
+}
+
+.pagination{
+	margin: 20px auto;
+
+}
+
+.pagination li{
+	box-shadow：0px 1px 1px #EDEDED;
+	margin: 2px;
+	float: left;
+}
+
+.check-box{
+	cursor: default;
+}
+
+.check-box label{
+	display: inline-block;
+	width: 50px;
+}

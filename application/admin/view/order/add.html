@@ -1,0 +1,353 @@
+<title>L-uo.ying.单子添加</title>
+<link rel="stylesheet" type="text/css" href="/lib/My97DatePicker/4.8/skin/WdatePicker.css" />
+<style>
+.dropDown-pos{
+	position: relative;
+}
+.dropDown-mymenu{
+	display: none;
+	position: absolute;
+	left: 177px;
+	top: 32px;
+	z-index: 100;
+	width: 400px;
+}
+</style>
+<section class="Hui-article-box">
+	<nav class="breadcrumb">
+		<i class="Hui-iconfont">&#xe67f;</i> 首页 
+		<span class="c-gray en">&gt;</span> 订单管理 
+		<span class="c-gray en">&gt;</span> 订单添加 
+		<a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" >
+			<i class="Hui-iconfont">&#xe68f;</i>
+		</a>
+	</nav>
+	<div class="Hui-article">
+		<article class="cl pd-20 container-fluid">
+	<form action="" method="post" class="form form-horizontal" id="form-admin-add">
+		<div class="leftapp col-xs-6">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>日期：</label>
+			<div class="formControls col-xs-8 col-sm-8">
+
+				<input type="text" class="input-text Wdate" placeholder="格式：2018-01-01" id="date" value="{:date('Y-m-d')}" name="date">	
+				{:token()}	
+				<!-- onclick="WdatePicker()"  -->
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>副本名称：</label>
+			<div class="formControls col-xs-8 col-sm-8"> 
+				<span class="select-box">
+					<select class="select" name="gameid" size="1" id="game">
+						<option value="" selected disabled> --- 请选择 --- </option>
+						{foreach $game as $g}
+							<option value="{$g.id}" disabled> ★----- {$g.name} -----</option>
+							{if (isset($g.son) )}
+							{foreach $g.son as $s}
+							<option value="{$s.id}"> &emsp; {$s.name}</option>
+							{/foreach}
+							{/if}
+						{/foreach}
+					</select>
+				</span> 
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-6 col-sm-3"><span class="c-red">*</span>总金额：</label>
+			<div class="formControls col-xs-8 col-sm-6">
+				<input type="text" class="input-text" autocomplete="off" placeholder="￥ 副本总金额" id="total" name="total" id="total">		
+			</div>
+			<div class="switch" data-on="danger" data-off="primary" data-on-label="未收" data-off-label="已收" id="mySwitch">
+				<input type="checkbox" checked id="is_receive" name="received" value="未收"/>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>参与人员：</label>
+			<div class="formControls col-xs-8 col-sm-8 skin-minimal">
+
+				<div class="check-box">
+					<input type="checkbox" id="check-qx" >
+					<label for="check-qx" style="cursor: pointer;">全选</label>
+				</div>
+				<div class="check-box">
+					<input type="checkbox" id="check-qk" >
+					<label for="check-qk" style="cursor: pointer;">清空</label>
+				</div>
+				<div class="check-box">
+					<input type="checkbox" id="check-gd" >
+					<label for="check-gd" style="cursor: pointer;">更多</label>
+				</div>
+
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"></label>
+			<div class="formControls col-xs-8 col-sm-8 skin-minimal" style="border: 1px solid #eee;" id="mymanagermore">
+			{foreach $manager as $m}
+				{if $m.id != 0}
+				<div class="check-box mem-box" style="padding: 6px 0;{if ($m.role_id >= 7)}display: none;{/if}">
+					<input name="person[{$m.id}]" type="checkbox" id="mem-{$m.id}" value="{$m.nickname}" style="{if ($m.role_id >= 7)}display: none;{/if}">
+					<label for="mem-{$m.id}" style="cursor: pointer;"> {$m.nickname} </label>
+				</div>
+				{/if}
+			{/foreach}
+			</div>
+		</div>
+		<div class="row cl bonusinfo" id="bonusinfo" data-number="0">
+			<label class="form-label col-xs-4 col-sm-3">提成：</label>
+			<div class="formControls col-xs-8 col-sm-3">
+				<input type="text" class="input-text bonus_price" placeholder="￥ 金额" name="bonus[0]">				
+			</div>
+			<div class="formControls col-xs-8 col-sm-3" > 
+				<span class="select-box">
+					<select class="select"  id="bonusselect" name="bonus_info[0]" size="1" >
+						<option value="0"> --- 请选择 --- </option>
+						{foreach $manager as $m}
+						{if $m.id != 0}
+						<option value="{$m.nickname}"> {$m.nickname} </option>		
+						{/if}			
+						{/foreach}
+						<option value="more"> --- 手动填写 --- </option>
+					</select>
+				</span> 
+			</div>
+			<div class="formControls col-xs-8 col-sm-1"> 
+				<input class="btn btn-secondary-outline radius" id="bonusbtn" type="button" value="再加一个">
+			</div>
+		</div>
+		<div class="row cl bonusinfo" style="display: none;">
+			<label class="form-label col-xs-4 col-sm-3"></label>
+			<div class="formControls col-xs-8 col-sm-3">
+				<input type="text" class="input-text bonus_price" placeholder="￥ 金额">				
+			</div>
+			<div class="formControls col-xs-8 col-sm-3" > 
+				<span class="select-box">
+					<select class="select" size="1" >
+						<option value="0"> --- 请选择 --- </option>
+						{foreach $manager as $m}
+						{if $m.id != 0}
+						<option value="{$m.nickname}"> {$m.nickname} </option>		
+						{/if}			
+						{/foreach}
+						<option value="more"> --- 手动填写 --- </option>
+					</select>
+				</span> 
+			</div>
+		</div>
+		
+		<div class="row cl dropDown-pos">
+			<label class="form-label col-xs-4 col-sm-3">所在区服：</label>
+			<div class="formControls col-xs-8 col-sm-8">
+				<input type="text" class="input-text" placeholder="哪个区的副本" id="area" name="area">
+			</div>
+			<ul class="dropDown-menu menu radius box-shadow dropDown-mymenu">
+			</ul>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">老板信息：</label>
+			<div class="formControls col-xs-8 col-sm-8">
+				<input type="text" class="input-text" placeholder="老板游戏信息" id="boss" name="boss">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">备注：</label>
+			<div class="formControls col-xs-8 col-sm-8">
+				<textarea name="remark" cols="" rows="" class="textarea"  placeholder="说点什么...100个字符以内" dragonfly="true"></textarea>
+				<p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-3 col-xs-offset-4 col-sm-offset-2">
+				<input class="btn btn-success-outline radius" id="achievebtn" lay-filter="formDemo" type="button" value="&nbsp;&nbsp;完成，右侧确认提交&nbsp;&nbsp;">
+			</div>
+		</div>
+		</div>
+		<div class="reright col-xs-6">
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">日期：</b>
+				<span id="redate"><span class="c-red">*</span></span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">副本名称：</b>
+				<span id="regame">未选择</span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">总金额：</b>
+				<span id="retotal"></span>
+				<span id="re_receive"></span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">参与人员：</b>
+				<span id="reperson">未选择</span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">人数：</b>
+				<span id="remember">0</span>
+			</div>		
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3" id="rebonus">提成：</b>
+				<span data-number="0"><i class="rebonus_info">无</i>  -  <i class="rebonus"> ￥ 0</i> </span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">所在区服：</b>
+				<span id="rearea">未填写</span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">老板信息：</b>
+				<span id="reboss">未填写</span>
+			</div>
+			<hr class="row cl col-xs-4 col-sm-8" style="margin-top: 20px;">
+			<br>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3" color='red'>注意事项：</b>
+				<span id="attention" style="color:red;"></span>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">实收金额：</b>
+				<div class="formControls col-xs-8 col-sm-3">
+					<input type="text" class="input-text" placeholder="￥  实收金额" id="rerealmoney" name="rerealmoney">
+				</div>
+			</div>
+			<div class="row cl">
+				<b class="col-xs-4 col-sm-3">平均工资：</b>
+				<div class="formControls col-xs-8 col-sm-3">
+					<input type="text" class="input-text" placeholder="￥  平均工资" id="resalary" name="resalary">
+				</div>
+			</div>
+			
+		</div>
+	</form>
+</article>
+	</div>
+</section>
+
+<script src="/static/admin/js/orderadd.js"></script>
+<script src="/static/admin/js/laydate.js"></script>
+<script>
+$(function(){
+
+//执行一个laydate实例
+var month = new Date();
+laydate.render({
+  elem: '#date', //指定元素
+  max: 0,
+	done: function(value, date, endDate){
+    $('#redate').html(value);
+  }
+  
+});
+var check_gd = $('#mymanagermore').html();
+/*给更多checkbox绑定事件*/
+$('#check-gd').change(function(){
+	if( $(this).prop('checked') ){
+		$('.mem-box').show();
+		$('.mem-box').find('input').show();
+	}else{
+		$('#mymanagermore').html(check_gd);
+	}
+});
+
+var dothing = true;
+
+$('#area').on({
+	compositionstart: function(){ dothing = false },
+	compositionend: function(){ dothing = true },
+	input :function(){
+		var that = this;
+        setTimeout(function(){
+
+			if( $(that).val() && dothing ){
+
+				$('.dropDown-mymenu').show();
+				/*发送ajax 获取所输入的大区推荐*/
+				$.ajax({
+					'url'	: '{:url("admin/AjaxApi/selectarea")}',
+					'type'	: 'post',
+					'data'	: 'areaname='+ $(that).val(),
+					'dataType': 'json',
+
+					'success':function(res){
+
+						if(res.code != 10000){
+							return false;
+						}else if(res.code == 10000){
+
+							let html = '';
+
+							for( i of res.data ){
+
+								html += '<li><a href="javascript:;">'+ i +'</a></li>';
+							}
+							
+							$('.dropDown-mymenu').html(html);
+						}
+					}
+				});
+			}else{
+
+				$('.dropDown-mymenu').hide();
+			}
+
+        },0);
+
+        $('#rearea').html( $(this).val() );
+	}
+});
+
+$('.dropDown-mymenu').on('click','a',function(){
+
+	$('#area').val( $(this).html() );
+	$('#rearea').html( $(this).html() );
+
+	$('.dropDown-mymenu').hide();
+})
+
+$('#area').bind('blur', function(){
+	setTimeout(function(){
+		$('.dropDown-mymenu').hide();
+	},300);
+});
+/*老板信息*/
+$('#boss').bind('input propertychange' , function(){
+	$('#reboss').html( $(this).val() );
+});
+
+/*给提交按钮绑定事件*/
+	$('.reright').on('click','#btnsub',function(){
+		/*防止重复提交*/
+		var flog = false;
+
+		if( flog == false ){
+
+			$('.leftapp :input').attr('disabled',false);
+			$('form').append('{:token()}');
+			/*发送ajax*/
+			$.ajax({
+				'url' : '{:url("admin/order/save")}',
+				'type': 'post',
+				'data': $('form').serializeArray(),
+				'dataType': 'json',
+
+				'success':function(res){
+
+					if(res.code != 10000){
+						alert(res.msg);
+						flog = true;
+						window.location.reload();
+						return flog;
+					}else if(res.code == 10000){						
+						$('.leftapp :input').attr('disabled',true);
+						layer.msg(res.msg, {icon: 6,time:1000});
+						$(window).attr('location','{:url("admin/order/index")}');
+						return flog;
+					}
+				}
+			});
+		}
+
+		return flog;
+	});
+});
+
+</script>

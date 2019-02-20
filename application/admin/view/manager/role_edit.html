@@ -1,0 +1,135 @@
+﻿<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="Bookmark" href="favicon.ico" >
+<link rel="Shortcut Icon" href="favicon.ico" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="/lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/css/style.css" />
+
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="/lib/layer/2.4/layer.js"></script> 
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/static/admin/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="/static/admin/h-ui.admin/js/H-ui.admin.page.js"></script> 
+<!--[if IE 6]>
+<script type="text/javascript" src="http://lib.h-ui.net/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<!--/meta 作为公共模版分离出去-->
+
+<title>角色权限分配 - 管理员管理</title>
+
+</head>
+<body>
+<article class="cl pd-20">
+	<form action="" method="post" class="form form-horizontal" id="form-admin-role-add">
+	<input type="hidden" name="id" value="{$role.id}">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="{$role.name}" placeholder="" id="name" name="name" datatype="*4-16" nullmsg="用户账户不能为空">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">权限分配：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+			{foreach $top_auth as $top_v}
+				<dl class="permission-list">
+					<dt>
+						<label>
+							<input type="checkbox" value="{$top_v.id}" name="auth_ids[]" class='top_auth' {in name='top_v.id' value='$role.auth_ids'}checked{/in}>
+							{$top_v.name}</label>
+					</dt>
+					<dd>
+						<dl class="cl permission-list2">
+							<dd style="margin-left: 0;">
+							{foreach $two_auth as $two_v}
+								{if $two_v.pid eq $top_v.id}
+								<label class="">
+									<input type="checkbox" value="{$two_v.id}"  class='two_auth' name="auth_ids[]" {in name='two_v.id' value='$role.auth_ids'}checked{/in}>
+									{$two_v.name}</label>
+								{/if}
+							{/foreach}
+							</dd>
+						</dl>						
+					</dd>
+				</dl>
+			{/foreach}				
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<button type="submit" class="btn btn-success radius" id="admin-role-save"><i class="icon-ok"></i> 确定</button>
+			</div>
+		</div>
+	</form>
+</article>
+
+<script type="text/javascript">
+$(function(){
+	/*顶级权限选中效果*/
+	$('.top_auth').change(function(){
+		/*获取当前check的选中状态*/
+		var status = $(this).prop('checked');
+		/*将当前行中的二级权限设置与顶级权限状态一致*/
+		$(this).closest('.permission-list').find('dd :checkbox').prop('checked',status);
+	});
+	/*二级权限选中效果*/
+	$('.two_auth').change(function(){
+		/*获取当前行中的二级权限被选中的个数*/
+		var checked = $(this).closest('dl').find('.two_auth:checked');
+		/*只要有一个以上的二级权限被选中，则顶级权限也要被选中*/
+		var status = checked.length > 0;
+		$(this).closest('.permission-list').find('.top_auth').prop('checked',status);
+	});
+	
+	$("#form-admin-role-add").validate({
+		rules:{
+			name:{
+				required:true,
+				maxlength:10,
+			},
+		},
+		onkeyup:false,
+		focusInvalid:true,
+		success:"valid",
+		submitHandler:function(form){
+			/*发送ajax*/
+			$.ajax({
+				'url'	: '{:url("admin/manager/role_update")}',
+				'type'	: 'post',
+				'data'	: $('form').serializeArray(),
+				'dataType' : 'json',
+				'success'  : function(res){
+					if( res.code != 10000 ){
+						alert(res.msg);
+						return;
+					}
+					alert(res.msg);
+					var index = parent.layer.getFrameIndex(window.name);
+					parent.location.reload();
+					parent.layer.close(index);					
+				}
+			});
+		}
+	});
+});
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

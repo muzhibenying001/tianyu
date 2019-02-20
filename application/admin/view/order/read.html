@@ -1,0 +1,259 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="Bookmark" href="favicon.ico" >
+<link rel="Shortcut Icon" href="favicon.ico" />
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="/lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="/static/admin/h-ui.admin/css/style.css" />
+
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="/lib/layer/2.4/layer.js"></script> 
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/static/admin/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="/static/admin/h-ui.admin/js/H-ui.admin.page.js"></script> 
+<!--[if IE 6]>
+<script type="text/javascript" src="http://lib.h-ui.net/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script>
+<![endif]-->
+<!--/meta 作为公共模版分离出去-->
+
+<title>订单详情查看 - 单子管理</title>
+
+</head>
+<body>
+<article class="cl pd-20">
+	<table class="table table-border  table-bg">
+				<thead>
+					<tr>
+						<th scope="col" colspan="5">单子详情 {$order.received ? "<span class='c-success r'> 已收款 ￥" .$order.realmoney . "</span>" : ""}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><b>日期：</b>{:date('Y-m-d',$order.date)}</td>
+						<td><b>副本名称：</b>{$order.game_name}</td>						
+						<td><b>总金额：</b> ￥ {$order.total}</td>						
+						<td><b>人数：</b>{$order.member}</td>						
+						<td><b>平均工资：</b> ￥ {$order.salary}</td>
+					</tr>
+					<tr>
+						<td><b>区服：</b>{$order.area}</td>
+						<td><b>老板：</b>{$order.boss}</td>						
+						<td colspan="3"><b>备注：</b>{$order.remark}</td>
+					</tr>
+					<tr>
+						<td><b>实收金额：</b> ￥ {$order.realmoney}</td>
+						<td><b>工资总额：</b>{$order.salary_tot}</td>						
+						<td colspan="3"><b>状态：</b>{$order.received ? '<span class="c-green">已收款</span>' : '<span class="c-red">未收款</span>'}</td>
+					</tr>
+				</tbody>
+	</table>
+	<table class="table table-border  table-bg">
+				<thead>
+					<tr>
+						<th scope="col" colspan="2">提成信息<span class="c-warning r"> 总提成：￥{$order.bonus_tot}</span></th>
+					</tr>
+				</thead>
+				<tbody>
+				{foreach $bonus as $b}
+					<tr>
+						<td>提成：{$b.name}</td>
+						<td>金额： ￥ {$b.money}</td>
+					</tr>
+				{/foreach}
+				</tbody>
+	</table>
+
+	<table class="table table-border table-bg table-hover">
+				<thead>
+					<tr>
+						<th scope="col" colspan="8">工资详情<span class="c-warning r"> 全部工资：￥{$salary_tot}&emsp;未发工资：￥{$salary_surplus}</span></th>
+					</tr>
+					<tr>
+						<th width="100">昵称</th>
+						<th width="100">工资</th>
+						<th>状态</th>
+						{if ($Think.session.manager_info.role_id <= 4)}
+						<th>操作</th>
+						<th width="100">修改</th>
+						<th width="100">按钮</th>
+						{/if}
+					</tr>
+				</thead>
+				<tbody>
+				{foreach $salary as $s}
+
+					<tr class="salary_tr">
+						<td salary_id="{$s.id}" status="{$s.status}" new_salary="0">{$s.name}</td>
+						<td class="salary_td"> ￥ {$s.salary}</td>
+						<td>{$s.status ? '<span class="c-green">已发放</span>' : '<span class="c-red">未发放</span>'}</td>
+						{if ($Think.session.manager_info.role_id <= 4)}
+						<td>
+							{if ($s.status == 0)}
+							<input type="button" class="btn btn-secondary-outline radius size-MINI" value="修改" onclick="salary_edit_button(this,{$s.id});">
+							<input type="button" class="btn btn-success-outline radius size-MINI" value="发放" onclick="salary_is_status({$s.id},this,{$s.status});">
+						</td>
+							{/if}
+						<td></td>
+						<td></td>
+						{/if}
+					</tr>
+
+				{/foreach}
+				</tbody>
+	</table>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20" id="salary_submit" style="display: none;">
+		<span class="r">
+			<span id="surplus">工资剩余： ￥ </span>&emsp;
+			<a href="javascript:;" onclick="surplus_average();" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 剩余平均</a>
+			<a class="btn btn-primary radius" onclick="admin_edit();" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 提交修改</a>
+		</span>
+	</div>
+
+</article>
+
+<script type="text/javascript">
+/*单独发放工资*/
+function salary_is_status(id,obj,status){
+	layer.confirm('确认提前发放工资吗？',function(index){
+		//此处请求后台程序，下方是成功后的前台处理……
+		/*发送ajax*/
+		$.ajax({
+			'url' : "{:url('admin/order/edit_salary_status')}",
+			'type': 'post',
+			'data': 'id='+id+'&status='+status,
+			'dataType' : 'json',
+			'success'  : function(res){
+				if( res.code != 10000 ){
+					alert(res.msg);
+					return;
+				}
+				/*请求成功*/
+				$(obj).closest('tr').find('span').attr('class','c-green').html('已发放');
+				$(obj).parent().html('');
+				layer.msg('已发放!', {icon: 1,time:2000});		
+			}
+		});
+	});
+}
+
+/*工资金额修改按钮*/
+function salary_edit_button(obj,id){
+	/*生成用于修改Input*/
+	$(obj).parent().next().html('<input type="text" class="input-text radius size-MINI">');
+	$(obj).parent().next().next().html('<input type="button" class="btn radius size-MINI" value="确定" onclick="salary_edit_input(this);"><a href="javascript:location.replace(location.href);" class="btn radius size-MINI">取消</a>');
+	/*去掉其它行的input与按钮*/
+	$(obj).closest('tr').siblings().find('input').attr('disabled',true);
+	/*显示计算按钮*/
+	$('#surplus').html('工资总额： ￥ ' + {$salary_surplus});
+	$('#surplus').attr('surplus_value',{$salary_surplus});
+	$('#salary_submit').show();
+}
+/*工资修改确定按钮*/
+function salary_edit_input(obj){
+	/*获取要修改的值*/
+	var new_salary = parseFloat( $(obj).closest('tr').find('input:text').val() );
+	/*获取要修改salaryid*/
+	var salary_id = $(obj).closest('tr').find('td').eq(0).attr('salary_id');
+
+	/*获取剩余工资总额*/
+	var surplus_html = parseFloat( $('#surplus').attr('surplus_value') );
+	if( !new_salary || new_salary==0 || isNaN(new_salary) ){
+		$(obj).closest('tr').find('input:text').val('');
+		layer.msg('输入有误，请输入正确的数字',{icon:2,time:1000});
+		return;
+	}
+
+	if( new_salary > $('#surplus').attr('surplus_value') ){
+		$(obj).closest('tr').find('input:text').val('');
+		layer.msg('要修改的金额不能大于工资总额！',{icon:2,time:1000});
+		return;
+	}
+	$(obj).closest('tr').find('td').eq(0).attr('status',3);
+	/*计算剩余金额*/
+	surplus_html -= new_salary;
+	surplus_html = ( Math.floor( surplus_html * 100 ) ) / 100;
+	$('#surplus').html('工资剩余： ￥ ' + surplus_html);
+	$('#surplus').attr('surplus_value',surplus_html);
+	$(obj).closest('tr').find('td').eq(0).attr('new_salary',new_salary);
+	$(obj).closest('tr').find('input:text').attr('disabled',true);
+	// console.log(surplus_html);
+}
+
+/*剩余工资平均计算按钮*/
+function surplus_average(){
+	/*获取表单上输入的值*/
+	var attr_new_salary = parseFloat( $('input:text').closest('tr').find('td').eq(0).attr('new_salary') );
+
+	if(attr_new_salary==0) return;
+	/*获取需要修改工资的salary_id*/ 
+	var salary_id = $('input:text').closest('tr').find('td').eq(0).attr('salary_id');
+	/*改变当前行的状态值*/
+	$('td[salary_id='+salary_id+']').attr('status',3);
+	/*计算新的剩余工资*/
+	surplus_fuc({$order.id},attr_new_salary,salary_id,'20004');
+}
+
+/*工资修改-提交*/
+function admin_edit(){
+	/*判断是否点击过确定*/
+	var new_salary = $('input:text').closest('tr').find('td').eq(0).attr('new_salary');
+	var input_status = $('input:text').attr('disabled');
+	if( new_salary==0 && input_status == 'disabled' ){
+		layer.msg('先确定修改才能提交！',{icon:2,time:1000});
+		return false;
+	}
+	layer.confirm('确认修改吗？',function(index){
+		var order_id = {$order.id};
+		var salary_id = $('input:text').closest('tr').find('td').eq(0).attr('salary_id');
+		var average = 20004;
+		var edit = 20002;
+		surplus_fuc(order_id,new_salary,salary_id,average,edit);
+		layer.msg('已修改!',{icon:1,time:1000});
+	});
+}
+
+/*计算剩余工资函数*/
+function surplus_fuc(order_id,new_salary=0,salary_id=0,average=0,edit=0){
+	/*拼接参数*/
+	var data = 'surplus=20001&order_id='+order_id+'&new_salary='+new_salary+'&salary_id='+salary_id+'&edit='+edit+'&average='+average;
+	/*发送ajax*/
+	$.ajax({
+		'url'	: '{:url("admin/order/edit_salary_status")}',
+		'type'	: 'post',
+		'data'	: data,
+		'dataType'	: 'json',
+		'success'	: function(res){
+			if( res.code != 10000 ){
+				layer.msg(res.msg,{icon: 5,time:1000});
+		 		return;
+			}
+
+			$('#surplus').html('工资剩余： ￥ ' + res.data);
+			$('#surplus').attr('surplus_value',res.data);
+			$('td[status=0]').next().html(' ￥ ' + res.data_new_surplus);
+			$('td[status=3]').next().html(' ￥ ' + new_salary);
+		}
+	});
+
+}
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>
