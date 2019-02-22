@@ -119,16 +119,24 @@ if( !function_exists('excelOffice') ){
 if( !function_exists( 'GetIp' ) ){
     #获取外网IP
     function GetIp(){
-
+        # 初始化curl
         $ch = curl_init('http://tool.huixiang360.com/zhanzhang/ipaddress.php');
-
+        # 配置curl 获取结果以字符类型返回
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+        # 设置超时时间，5秒中无响应，返回false
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        # 执行
         $a  = curl_exec($ch);
+        # 关闭连接
+        curl_close($ch);
+        # 处理返回结果
+        if( $a ){
+            # 将结果字符串处理为数组
+            preg_match('/\[(.*)\]/', $a, $ip);
+            return $ip[1];
+        }
 
-        preg_match('/\[(.*)\]/', $a, $ip);
-
-        return $ip[1];
+        return false;
 
     }
 }
@@ -136,27 +144,17 @@ if( !function_exists( 'GetIp' ) ){
 if( !function_exists( 'GetIpLookup' ) ){
     #通过IP获取城市信息
     function GetIpLookup($ip = ''){
-        if(empty($ip)){
-            $ip = GetIp();
-        }
-        $url="http://ip.taobao.com/service/getIpInfo.php?ip=".$ip;
-            $ip=json_decode(file_get_contents($url));   
-            if((string)$ip->code=='1'){
-               return false;
-            }
-            $data = (array)$ip->data;
 
-        return $data;
+        if(empty($ip)) return false;
+
+        $ch = curl_init('http://ip.taobao.com/service/getIpInfo.php?ip='.$ip);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+        $ip_info = curl_exec($ch);
+
+        #未完...
     }
 }
 
-if( !function_exists( 'GetIpBy360' ) ){
-    #通过IP获取城市信息
-    function GetIpBy360(){
-        
-        $url="http://ip.360.cn/IPShare/info";
-        $ip=json_decode(file_get_contents($url));   
-        
-        return $ip;
-    }
-}

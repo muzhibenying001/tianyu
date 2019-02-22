@@ -70,13 +70,20 @@ class Login extends Controller
             session('manager_info',$manager->toArray());
             #记录登陆时间
             $manager->last_login_time = time();
-            #记录登录IP
-            $info = GetIpBy360();
-            $manager->last_login_ip = $info->ip;
-            #记录登陆城市
-            $manager->last_login_city = $info->location;
-            #记录入库
-            $manager->save();
+            #获取登录IP
+            if( $ip = GetIp() ){
+                #获取ip相关信息
+                $ipinfo = GetIpLookup($ip);
+
+                if( $ipinfo ){
+                    
+                    $manager->last_login_ip = $ip;
+                    #记录登陆城市
+                    $manager->last_login_city = $info->location;
+                    #记录入库
+                    $manager->save();
+                }
+            }
 
             $res = [
                 'code' => 10000,
@@ -103,6 +110,10 @@ class Login extends Controller
 
     public function test(){
         // echo GetIpBy360();
-        echo encrypt_password('12398700');
+        echo encrypt_password('123456');
+        // echo GetIp();
+        // dump(empty(false));
+        GetIpLookup( '111.193.63.219' );
+        // dump(  );
     }
 }
