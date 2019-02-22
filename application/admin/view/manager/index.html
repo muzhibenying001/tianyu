@@ -54,10 +54,15 @@
 						<td class="td-manage">
 							<a style="text-decoration:none" onClick="admin_stop(this,'10001')" href="javascript:;" title="停用">
 								<i class="Hui-iconfont">&#xe631;</i>
-							</a> 
+							</a>
 							<a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','admin-add.html','1','800','500')" class="ml-5" style="text-decoration:none">
 								<i class="Hui-iconfont">&#xe6df;</i>
 							</a>
+							{if ($Request.session.manager_info.id == 0)}
+							<a title="重置密码" href="javascript:;" onclick="reset_pwd('{:url(\'admin/manager/reset_pwd\')}',{$m.id})" class="ml-5" style="text-decoration:none">
+								<i class="Hui-iconfont">&#xe6f7;</i>
+							</a>
+							{/if}
 							<a title="分配角色" href="javascript:;" 
 							onclick="admin_role('分配角色','{:url(\'admin/manager/manager_role_html\',[\'id\'=>$m.id])}','800','500')" 
 							class="ml-5" style="text-decoration:none">
@@ -76,6 +81,11 @@
 							<a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','admin-add.html','1','800','500')" class="ml-5" style="text-decoration:none">
 								<i class="Hui-iconfont">&#xe6df;</i>
 							</a>
+							{if ($Request.session.manager_info.id == 0)}
+							<a title="重置密码" href="javascript:;" onclick="reset_pwd('{:url(\'admin/manager/reset_pwd\')}',{$m.id})" class="ml-5" style="text-decoration:none">
+								<i class="Hui-iconfont">&#xe6f7;</i>
+							</a>
+							{/if}
 							<a title="分配角色" href="javascript:;" 
 							onclick="admin_role('分配角色','{:url(\'admin/manager/manager_role_html\',[\'id\'=>$m.id])}','800','500')" 
 							class="ml-5" style="text-decoration:none">
@@ -150,6 +160,29 @@ function admin_start(obj,id){
 		$(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已启用</span>');
 		$(obj).remove();
 		layer.msg('已启用!', {icon: 6,time:1000});
+	});
+}
+
+/*重置密码*/
+function reset_pwd(url,id){
+	layer.confirm('确认要重置密码吗？',function(index){
+		/*发送ajax*/
+		$.ajax({
+			'url'		: url,
+			'type'		: 'post',
+			'data'		: 'id=' + id,
+			'dataType'	: 'json',
+			'success'	: function(res){
+				
+				if( res.code != 10000 ){
+					layer.msg(res.msg,{icon: 5,time:1000});
+					return;
+				}
+
+				layer.msg(res.msg,{icon:1,time:1000});
+				
+			}
+		});
 	});
 }
 </script> 

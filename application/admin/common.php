@@ -28,7 +28,7 @@ if( !function_exists('encrypt_password') ){
         #加盐方式
         $salt = 'asdfjl.+-soi/*,*1o34ukl2q349012..,';
 
-        return md5( md5($password) . $salt );
+        return md5( md5($password) . md5($salt) );
     }
 }
 

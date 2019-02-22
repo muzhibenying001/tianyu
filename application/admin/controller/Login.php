@@ -102,6 +102,7 @@ class Login extends Controller
     }
 
     public function test(){
-        echo GetIpBy360();
+        // echo GetIpBy360();
+        echo encrypt_password('12398700');
     }
 }

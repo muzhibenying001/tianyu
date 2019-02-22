@@ -165,7 +165,7 @@ class Order extends Base
                 'msg'   => '没有选择参与人员'
             ];
 
-            echo json_encode($res);die;
+            return json($res);
         }
 
         #2、计算平均工资，只取小数点后两位 实收金额/人员数量
@@ -177,7 +177,7 @@ class Order extends Base
                 'msg'   => '平均工资计算有误，重新按正确格式填写表单'
             ];
 
-            echo json_encode($res);die;
+            return json($res);
         }
         #定义变量，存储提成总额
         $data['bonus_tot'] = 0;
@@ -250,9 +250,9 @@ Db::startTrans();
             #计算实收金额与工资总额是否合法
             $salary_tot = 0;
             foreach ($salary_data as $value) {
-                $salary_tot += $value['salary'];
+                $salary_tot += $value['salary'] * 100;
             }
-            if( $realmoney < $salary_tot ){ $this->error('实收金额大于工资总额'); return;}
+            if( $realmoney < $salary_tot/100 ) throw new \Exception("发放失败，订单数有误");
             #整合提成信息
             $bonus_data = [];
             foreach( $bonus_temp as $v ){

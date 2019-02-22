@@ -221,4 +221,42 @@ class Manager extends Base
 
         $this -> closelayer('修改成功');
     }
+
+    #修改个人密码页面
+    public function change_pwd($id){
+        #判断id有效性，只允许修改当前登陆账号的密码
+        if( intval($id) !== session('manager_info')['id'] ) $this -> error('只允许修改自己账号密码！');
+        #查询管理员信息
+        $manager = mm::find($id);
+        #判断id合法性
+        if( !$manager ) $this -> error('该用户不存在！');
+        return view('change_pwd',['username'=>$manager->username]);
+    }
+
+    #重置密码
+    public function reset_pwd($id){
+        #通过$id查询管理员信息
+        $manager = mm::find($id);
+        #判断id有效性
+        if( !$manager ){
+            #返回结果
+            $res = [
+                'code' => 10001,
+                'msg'  => '用户不存在'
+            ]; 
+        }else{            
+            #设置默认密码为需要修改的用户的username
+            $password = encrypt_password($manager->username);
+            #修改入库
+            $manager -> password = $password;
+            $manager -> save();
+            #返回结果
+            $res = [
+                    'code' => 10000,
+                    'msg'  => '密码重置成功'
+            ];
+        }
+
+        return json($res);
+    }
 }
