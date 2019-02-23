@@ -135,7 +135,7 @@ class Index extends Base
             }
 
             #本周单子统计
-            if( $value['date'] >= $t_day ){
+            if( $value['date'] >= $w_day ){
                 $order_all['w_all_salary'] += $value['salary'] * 100;
                 if( $value['status'] == 1 ) {
                     #已发工资
@@ -147,7 +147,7 @@ class Index extends Base
             }
 
             #本月单子统计
-            if( $value['date'] >= $t_day ){
+            if( $value['date'] >= $m_day ){
                 $order_all['m_all_salary'] += $value['salary'] * 100;
                 if( $value['status'] == 1 ) {
                     #已发工资
