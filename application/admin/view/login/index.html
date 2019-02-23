@@ -7,48 +7,45 @@
 <link rel="stylesheet" type="text/css" href="/lib/Hui-iconfont/1.0.8/iconfont.css" />
 <link rel="stylesheet" href="/static/admin/css/loginMy.css"/>
 
-{literal}
-<style>
-html,body{width:100%;}
 
-.captcha{
-	position: absolute;
-	height: 40px;
-	margin-left: -117px;
-	margin-top: 23px;
-	border-radius: 3px;
+<style>
+
+#surePwd{
+    background-image: url({:captcha_src()});
+    background-repeat: no-repeat;
+    background-position: 96%;
+    background-size: 30% 78%;
 }
-#check{
-	margin-top:30px;
-	width: 15px;
-	height: 15px;
+
+.notice{
+    display: block;
+    position: absolute;
+    width: 300px;
+    height: auto;
+    margin-top: -13px; 
 }
 </style>
-{/literal}
+
 </head>
 <body>
 
 <div class="main">
 
 	<div class="center">
-		<form action="" id="formOne" method="post">
+		<form action="javascript:;" id="formOne" method="post" class="demo-ruleForm">
 			<i class="Hui-iconfont Cone"> &#xe62d; | </i>
 			<input type="text" name="username" id="user" placeholder="用户名" onblur="checkUser()"/>
-			<span id="user_pass"></span>
+			<span id="user_pass" class="notice"></span>
 			<br/>
 			<i class="Hui-iconfont Cone"> &#xe605; | </i>
-			<input type="password" name="password" id="pwd" placeholder="密码" onblur="checkUser1()"/>
-			<span id="pwd_pass"></span>
+			<input type="password" name="password" autocomplete="new-password" id="pwd" placeholder="密 码" onblur="checkUser1()"/>
+			<span id="pwd_pass" class="notice"></span>
 			<br/>
 			<i class="Hui-iconfont Cone"> &#xe613; | </i>
-			<input type="text" name="captcha" id="surePwd" placeholder="验证码" onblur="checkUser2()"/>
-			<img src="{:captcha_src()}" class="captcha" onclick="this.src='{:captcha_src()}?'+Math.random()" />
-			<span id="surePwd_pass" ></span><br/>
+			<input type="text" name="captcha" id="surePwd" placeholder="验证码，双击切换验证码" onblur="checkUser2()" ondblclick="this.style.backgroundImage='url({:captcha_src()}?'+Math.random()+')'"/>
+			<span id="surePwd_pass" class="notice"></span>
 
-			<input type="checkbox" value="rememberMe" name="rememberMe" id="check" /> 
-			<label for="check">七天免登陆</label>
-
-			<input type="submit" value="登录" id="submit" onclick="return submitB('{:url(\'admin/index/index\')}','{:url(\'admin/login/login\')}')">
+			<input type="submit" value="登 陆" id="submit" onclick="return submitB()">
 			<br/>
 		</form>
 	</div>
@@ -56,8 +53,147 @@ html,body{width:100%;}
 </div>
 
 
-<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script> 
-<script type="text/javascript" src="/static/admin/js/loginMy.js"></script>
+<script type="text/javascript" src="/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/lib/layer/2.4/layer.js"></script>
 
 </body>
+<script type="text/javascript">
+//获取input
+var user = $('#user');
+var pwd = $('#pwd');
+var surePwd = $('#surePwd');
+
+//获取span的所有id
+var user_pass = $("#user_pass");
+var pwd_pass = $("#pwd_pass");
+var surePwd_pass = $("#surePwd_pass");
+
+var checkcss = {
+	'fontSize': '13px',
+	'width': '250px',
+	'height': '2em',
+	'textAlign': 'center',
+	'lineHeight': '2em',
+	'marginTop': '-13px',
+	'display': 'block'
+}
+function checkUser(){
+    //如果昵称未输入，则提示输入昵称
+    if(!user.val()){
+        user_pass.css(checkcss);
+        user_pass.html('还没有填写用户名哦。');
+    }
+    else{
+        user_pass.css('display','none');
+        user_pass.html('');
+    }
+}
+
+//输入密码提示
+function checkUser1(){
+    //如果未输入密码，则提示请输入密码
+    if(!pwd.val()){
+        pwd_pass.css(checkcss);
+        pwd_pass.html('还没有填写密码哦。');
+    }
+    else{
+    	pwd_pass.css('display','none');
+        pwd_pass.html('');
+    }
+
+}
+
+//验证提示
+function checkUser2(){
+
+    if(!surePwd.val()){
+        surePwd_pass.css(checkcss);
+        surePwd_pass.html('还没有填写验证码哦。');
+    }
+    else{
+    	surePwd_pass.css('display','none');
+        surePwd_pass.html('');
+    }
+}
+
+function submitB(url,login){
+
+    if(!user.val()){
+        user_pass.css(checkcss);
+        user_pass.html('请填写您的用户名。');
+        user.focus();
+        return false;
+    }
+    if(!pwd.val()){
+        pwd_pass.css(checkcss);
+        pwd_pass.html('请填写您的用户密码。');
+        pwd.focus();
+        return false;
+    }
+    if(!surePwd.val()){
+        surePwd_pass.css(checkcss);
+        surePwd_pass.html('请填写验证码。');
+        surePwd.focus();
+        return false;
+    }
+
+    /*发送ajax*/
+    $.ajax({
+    	'url'	: "{:url('admin/login/login')}",
+    	'type'	: 'post',
+    	'data'	: 'username='+user.val()+'&password='+pwd.val()+'&captcha='+surePwd.val(),
+    	'dataType'	: 'json',
+    	'timeout'	: 10000,
+    	'beforeSend': function(XHR){
+			$('#submit').attr('disabled',true).val('正在登陆...');
+    	},
+    	'success'	: function(res){
+    		if( res.code != 10000 ){
+				layer.msg(res.msg, {icon: 2,time:1000});
+				return false;
+			}
+			
+			var FUNC=[
+				function() {
+					layer.msg('欢迎回来', {icon: 6,time:2000});
+					aniCB();
+				},
+				function() {
+					setInterval(function(){
+						$(window).attr('location','{:url("admin/index/index")}');
+					},1000);
+				}
+			];  
+			var aniCB=function() {  
+				$(document).dequeue("myAnimation");  
+			}  
+			$(document).queue("myAnimation",FUNC);  
+			aniCB();
+
+    	},
+    	'complete'	:function(){    			
+			$('#submit').attr('disabled',false).val('登 陆');
+			surePwd.css('backgroundImage','url({:captcha_src()}?'+Math.random()+')');
+
+    	},
+    	'error'		: function(XMLHttpRequest, textStatus, errorThrown){
+    		switch(textStatus){
+    			case 'timeout':
+    				layer.msg('连接超时，请检查网络', {icon: 2,time:1500});
+    				break;
+    			case 'error':
+    				layer.msg(textStatus, {icon: 2,time:1500});
+    				break;
+    			default:
+    				layer.msg('出错啦，请联系管理员处理！', {icon: 2,time:2000});
+    				break;
+    		}
+    	}
+    });
+    return false;
+
+
+}
+
+</script>
 </html>

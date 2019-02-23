@@ -1,0 +1,95 @@
+﻿
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+html,body{
+    width:100%;
+    height: 100%;
+}
+
+body{
+    background-image: url(../Images/bg03.jpg);
+    transform-origin: center top 0px;
+    overflow:hidden
+}
+.main{
+    background-size: 100% 100%;
+    margin-top: 6%;
+    background-image: url(../Images/huabian.png);
+    background-repeat: no-repeat;
+    background-size: 73% 100%;
+    background-position: 56% 42%;
+}
+
+.main .center{
+    width: 580px;
+    height: 28em;
+    padding: 80px 90px 0 0;
+    background-image: url(../Images/center.png);
+    background-size: 170% 150%;
+    background-position: 53% 49%;
+    opacity: 1;
+    margin: auto;
+    font-size:14px;
+    color: #cccccc;
+    position: relative;
+}
+
+
+.demo-ruleForm {
+  width: 300px;
+  margin: 20px auto;
+}
+
+input{
+    width: 330px;
+    height: 3.5em;
+    background-color: rgba(224, 227, 232, 0.11);
+    border-radius: 5px;
+    opacity: 1;
+    outline-style:none;
+    border: 1px solid rgba(239, 239, 239, 0.15);
+    font-size: 1em;
+    color: #bdc0b8;
+    font-family: "微软雅黑";
+    padding-left:40px;
+    margin: 10px auto;
+}
+
+.Cone{
+    color: #adadad;
+    position: absolute;
+    margin-left: 8px;
+    margin-top: 3%;
+    height: 3em;
+    font-size:1.35em;
+}
+input:focus{
+    background-color: rgba(196, 199, 204, 0.40);
+    /*border: 1px solid #7FCAF1;*/
+    box-shadow: 0px 0px 5px rgba(241, 237, 239, 0.35);
+    opacity: 1;
+}
+#submit{
+    width: 375px;
+    line-height: 1.5em;
+    font-size: 1em;
+    background-color: rgba(0, 133, 159, 0.96);
+    font-weight: bolder;
+    font-family: "微软雅黑";
+    opacity: 1;
+    margin: 10px auto;
+    text-align: center;
+    padding: 0;
+}
+#submit:active{
+    background-color: rgba(0, 113, 136, 0.96);
+    top: 5px;
+    box-shadow: 0px 0px 5px rgba(241, 237, 239, 0.35);
+}
+
+
+
+

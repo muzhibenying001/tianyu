@@ -236,10 +236,4 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
-    #验证码设置
-    'captcha' => [
-        'length' => 4,
-        'fontSize' => 40,
-        'imageW' => 280,
-    ],
 ];
