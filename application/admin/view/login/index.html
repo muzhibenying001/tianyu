@@ -160,7 +160,8 @@ function submitB(url,login){
 				},
 				function() {
 					setInterval(function(){
-						$(window).attr('location','{:url("admin/index/index")}');
+                        $(location).attr('href', '{:url("admin/index/index")}');
+						// $(window).attr('location','{:url("admin/index/index")}');
 					},1000);
 				}
 			];  

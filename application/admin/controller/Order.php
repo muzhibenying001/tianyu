@@ -20,17 +20,79 @@ class Order extends Base
      */
     public function index()
     {
+        #获取模糊查询参数
+        $see_about = request() -> param();
+        // dump($see_about);
+        $see_about_where = [];
+        #模糊查询最小时间
+        $datemin = isset($see_about['datemin']) && !empty($see_about['datemin']) ? strtotime($see_about['datemin']) : 1546185600;
+        #模糊查询最大时间
+        $datemax = isset($see_about['datemax']) && !empty($see_about['datemax']) ? strtotime($see_about['datemax']) : time();
+        #模糊查询区服老板
+        if($see_about['areainfo'] = isset($see_about['areainfo']) && !empty($see_about['areainfo']) ? trim($see_about['areainfo']) : '')
+            $see_about_where['boss|area'] = ['like','%'.$see_about['areainfo'].'%'];
+        $see_about_where['date'] = ['between',[$datemin,$datemax]];
+        #模糊查询提成人员
+        $about_bonus_name = isset($see_about['bonus_name']) && !empty($see_about['bonus_name']) ? $see_about['bonus_name'] : '';
+        if( $about_bonus_name ){            
+            $bonus = bm::where('name',$about_bonus_name)->select();
+            foreach ($bonus as $value) {
+                $temp[] = $value['order_id'];
+            }
+            $see_about_where['o.id'] = ['in',implode(',', $temp)];
+        }
+        #模糊查询单子状态
+        $about_status_name = isset($see_about['status_name']) && !empty($see_about['status_name']) ? intval($see_about['status_name']) : '';
+        $about_salary_info = [];
+        if( $about_status_name ){
+            switch ($about_status_name) {
+                case 1:
+                    $see_about_where['o.received'] = ['=',1];
+                    break;
+                case 2:
+                    $see_about_where['o.received'] = ['=',0];
+                    break;
+                case 3:
+                    $about_salary_info['status'] = ['=',1];
+                    break;
+                case 4:
+                    $about_salary_info['status'] = ['=',0];
+                    break;
+            }
+        }
+        #模糊查询参与人员
+        $about_person_name = isset($see_about['person_name']) && !empty($see_about['person_name']) ? intval($see_about['person_name']) : '';
+        if( $about_person_name || $about_status_name ){
+            if( $about_person_name ) $about_salary_info['manager_id'] = ['=',$about_person_name];
+            $salary = sm::where($about_salary_info)->select();
+            foreach ($salary as $value) {
+                $temp[] = $value['order_id'];
+            }
+            #去重
+            $result_01 = array_flip($temp);
+            if( $about_bonus_name ){                
+                $result_02 = array_flip($result_01);
+                $temp = array_diff_assoc ( $temp, $result_02 ); 
+            }else{
+                $temp = array_flip($result_01);
+            }
+            $see_about_where['o.id'] = ['in',implode(',', $temp)];
+        }
+        #模糊查询副本
+        $about_game_name = isset($see_about['game_name']) && !empty($see_about['game_name']) ? intval($see_about['game_name']) : '';
+        if( $about_game_name ) $see_about_where['o.gameid'] = ['=',$about_game_name];
         #查询模型
         // $order = om::order('date desc,create_time desc') -> paginate(10);
         $order = om::alias('o')
             -> field('o.*,g.name game_name')
             -> join('games g','o.gameid=g.id','left')
+            -> where($see_about_where)
             -> order('date desc,create_time desc')
             -> paginate(20);
-
+        $bonus = bm::select();
         $manager = mm::select();
         $salary = sm::select();
-        $bonus = bm::select();
+        $game = gm::games_tree();
         #整合数据
         #将manager数据整合为以id为下标的,nickname为值的二维数组
         $manager = ( new \think\Collection($manager) ) -> toArray();
@@ -43,11 +105,28 @@ class Order extends Base
         $salary = ( new \think\Collection($salary) ) -> toArray();
         $person = [];
         foreach( $salary as $v ){
-            $v['manager_id'] = $person_name[ $v['manager_id'] ];
-            $person[ $v['order_id'] ][] = $v['manager_id'];
+            $v['manager'] = $person_name[ $v['manager_id'] ];
+            $person[ $v['order_id'] ][ $v['manager_id'] ] = $v['manager'];
         }unset($v);
+        #获取订单表中所有参与人员，用于模糊搜索下拉菜单
+        $person_memname = [];
+        foreach ($person as $value) {
+            foreach ($value as $k => $v) {
+                # code...
+                $person_memname[$k] = $v;
+            }
+        }
         #将订单id做为提成表下标
         $bonus = ( new \think\Collection($bonus) ) -> toArray();
+        #获取提成表中，所有人员名称，用于模糊搜索下拉菜单
+        $bonus_memname = [];
+        foreach ($bonus as $value) {
+            $bonus_memname[] = $value['name'];
+        }
+        #提成人员数组去重
+        $result_01 = array_flip($bonus_memname);
+        $bonus_memname = array_flip($result_01);
+
         $bonus_name = [];
         foreach( $bonus as $v ){
             $bonus_name[ $v['order_id'] ][] = $v['name']; 
@@ -60,7 +139,17 @@ class Order extends Base
         
         // dump(request()->param()['get_execl']);
         // dump($order->toArray());die;
-        return view('index',['order'=>$order,'order_total'=>$order->toArray()['total']]);
+        return view('index',[
+                                'order'=>$order,
+                                'order_total'=>$order->toArray()['total'],
+                                'datemin'=>$datemin,
+                                'datemax'=>$datemax,
+                                'areainfo'=>$see_about['areainfo'],
+                                'bonus_memname'=>$bonus_memname,
+                                'person_memname'=>$person_memname,
+                                'game'=>$game
+                            ]
+        );
     }
 
     #被软删除的列表
@@ -558,6 +647,11 @@ Db::startTrans();
         ];
 
         return json($res);
+    }
+
+    public function test(){
+        $data = request() -> param();
+        dump(date('Y-m-d',strtotime($data['datemin'])) );
     }
 
 }

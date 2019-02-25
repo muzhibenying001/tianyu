@@ -1,6 +1,8 @@
 <title>L-uo.ying.单子管理</title>
 <link rel="stylesheet" type="text/css" href="/lib/My97DatePicker/4.8/skin/WdatePicker.css" />
+<style type="text/css">
 
+</style>
 <section class="Hui-article-box">
 	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
 		<span class="c-gray en">&gt;</span>
@@ -10,17 +12,19 @@
 	<div class="Hui-article">
 		<article class="cl pd-20">
 			<div class="text-c"> 日期范围：
-
-				<input type="text" id="datemin" class="input-text Wdate" style="width:120px;">
+				<input type="text" id="datemin" name="datemin" class="input-text Wdate" autocomplete="off" style="width:120px;" value="{:date('Y-m-d',$datemin)}">
 				-
-				<input type="text" id="datemax" class="input-text Wdate" style="width:120px;">
-
-				<input type="text" class="input-text" style="width:250px" placeholder="输入需要查询的区、服、老板信息" id="" name="">
-				<button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜 索</button>
+				<input type="text" id="datemax" name="datemax" class="input-text Wdate" autocomplete="off" style="width:120px;" value="{:date('Y-m-d',$datemax)}">
+				<input type="text" class="input-text" style="width:250px" placeholder="输入需要查询的区、服、老板信息"autocomplete="off" name="areainfo" value="{$areainfo}" id="areainfo">
+				<button type="button" class="btn btn-success" id="lookup" name=""><i class="Hui-iconfont">&#xe665;</i> 搜 索</button>
 			</div>
 			<div class="cl pd-5 bg-1 bk-gray mt-20">
-<!-- 				<span class="l"> <a href="{:url('admin/order/edit')}" class="btn btn-danger radius">下载单子表</a> <a href="{:url('admin/order/add')}" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加单子</a> </span> -->
-<span class="l"> <a href="javascript:;" onclick="down('下载单子表','{:url(\'admin/order/edit\')}')" class="btn btn-danger radius">下载单子表</a> <a href="{:url('admin/order/add')}" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加单子</a> </span>
+				<span class="l"> 
+					<a href="javascript:;" onclick="down('下载单子表','{:url(\'admin/order/edit\')}')" class="btn btn-danger radius">下载单子表</a> 
+					<a href="{:url('admin/order/add')}" class="btn btn-primary radius">
+						<i class="Hui-iconfont">&#xe600;</i> 添加单子
+					</a> 
+				</span>
 				<span class="r">共有数据：<strong>{$order_total}</strong> 条</span>
 			</div>
 			<table class="table table-border table-bordered table-bg table-hover">
@@ -28,52 +32,57 @@
 					<tr>
 						<td scope="col" colspan="3">
 							<span class="select-box">
-								<select class="select" size="1" name="demo1" id="">
-									<option value="" selected>近三个月订单</option>
-									<option value="1">近三十天</option>
-									<option value="2">本月</option>
-									<option value="3">全部</option>
+								<select class="select" size="1" name="demo1" id="three_months">
+									<option value="near_three_months" {if ($Request.param.datemin == '-0year-3month-0day')}selected{/if} >近三个月订单</option>
+									<option value="thirty_days" {if ($Request.param.datemin == '-0year-1month-0day')}selected{/if}>近三十天</option>
+									<option value="this_month" {if ($Request.param.datemin == date("Y-m-01",time()))}selected{/if}>本月</option>
+									<option value="all" {if ($Request.param.datemin == '')}selected{/if}>全部</option>
 								</select>
 							</span>
 						</td>
 						<td scope="col" colspan="3">
 							<span class="select-box">
-								<select class="select" size="1" name="demo1">
+								<select class="select" size="1" name="demo1" id="bonus_name">
 									<option value="">选择提成人员</option>
-									<option value="1">菜单一</option>
-									<option value="2">菜单二</option>
-									<option value="3">菜单三</option>
+									{foreach $bonus_memname as $v}
+									<option value="{$v}" {if ($Request.param.bonus_name == $v)}selected{/if}>{$v}</option>
+									{/foreach}
 								</select>
 							</span>
 						</td>
 						<td scope="col" colspan="2">
 							<span class="select-box">
-								<select class="select" size="1" name="demo1">
-									<option value="" selected>选择参与成员</option>
-									<option value="1">菜单一</option>
-									<option value="2">菜单二</option>
-									<option value="3">菜单三</option>
+								<select class="select" size="1" name="demo1" id="person_name">
+									<option value="">选择参与成员</option>
+									{foreach $person_memname as $k=>$v}
+									<option value="{$k}" {if ($Request.param.person_name == $k)}selected{/if}>{$v}</option>
+									{/foreach}
 								</select>
 							</span>
 						</td>
 						<td scope="col" colspan="2">
 							<span class="select-box">
-								<select class="select" size="1" name="demo1">
-									<option value="" selected>选择副本</option>
-									<option value="1">菜单一</option>
-									<option value="2">菜单二</option>
-									<option value="3">菜单三</option>
+								<select class="select" size="1" name="demo1" id="game_name">
+									<option value="">选择副本</option>
+									{foreach $game as $g}
+										<option value="{$g.id}" disabled> ★--- {$g.name} ---</option>
+										{if (isset($g.son) )}
+										{foreach $g.son as $s}
+										<option value="{$s.id}" {if ($Request.param.game_name == $s.id)}selected{/if}> &emsp; {$s.name}</option>
+										{/foreach}
+										{/if}
+									{/foreach}
 								</select>
 							</span>
 						</td>
 						<td scope="col" colspan="2">
 							<span class="select-box">
-								<select class="select" size="1" name="demo1">
-									<option value="" selected>选择状态</option>
-									<option value="1">已收款</option>
-									<option value="2">未收款</option>
-									<option value="3">工资已发放</option>
-									<option value="3">工资未发放</option>
+								<select class="select" size="1" name="demo1" id="status_name">
+									<option value="">选择状态</option>
+									<option value="1" {if ($Request.param.status_name == 1)}selected{/if}>已收款</option>
+									<option value="2" {if ($Request.param.status_name == 2)}selected{/if}>未收款</option>
+									<option value="3" {if ($Request.param.status_name == 3)}selected{/if}>工资已发放</option>
+									<option value="4" {if ($Request.param.status_name == 4)}selected{/if}>工资未发放</option>
 								</select>
 							</span>
 						</td>
@@ -145,8 +154,12 @@ $(function(){
 	laydate.render({
 	  elem: '#datemin', //指定元素
 	  max: 0
-	  });
-	  
+	});
+	var month = new Date();
+	laydate.render({
+	  elem: '#datemax', //指定元素
+	  max: 0
+	});
 });
 
 
@@ -240,5 +253,82 @@ function particulars(title,url){
 function down(title,url){
 	layer_show(title,url);
 }
+
+$(function(){
+/* 时间下拉菜单 */
+$('#three_months').change(function(){
+	
+	if( $(this).val() == 'near_three_months' ){
+		/*近三个月*/
+		$(location).attr('href','{:url("admin/order/index","datemin=-0year-3month-0day" )}');
+	}else if( $(this).val() == 'thirty_days' ){
+		/*近三十天*/
+		$(location).attr('href','{:url("admin/order/index","datemin=-0year-1month-0day" )}');
+	}else if( $(this).val() == 'this_month' ){
+		/*本月*/
+		$(location).attr('href','{:url("admin/order/index","datemin=".date("Y-m-01",time()) )}');
+	}else if( $(this).val() == 'all' ){
+		/*全部*/
+		$(location).attr('href','{:url("admin/order/index")}');
+	}
+
+});
+/*提成人员下拉菜单*/
+$('#bonus_name').change(function(){
+	
+	url = getUrl();
+
+	
+});
+/*参与人员下拉菜单*/
+$('#person_name').change(function(){
+
+	url = getUrl();
+
+});
+/*副本下拉菜单*/
+$('#game_name').change(function(){
+
+	url = getUrl();
+
+});
+/*单子状态下拉菜单*/
+$('#status_name').change(function(){
+
+	url = getUrl();
+
+});
+/* 搜索按钮点击事件 */
+$('#lookup').click(function(){
+	
+	url = getUrl();
+
+});
+
+});
+
+/*获取url的函数,参数为需要传递的url参数*/
+function getUrl(){
+	let datemin = $('#datemin').val() ? $('#datemin').val() : '';
+	let datemax = $('#datemax').val() ? $('#datemax').val() : '';
+	let areainfo = $('#areainfo').val() ? $('#areainfo').val() : '';
+	let bonus_name = $('#bonus_name').val() ? $('#bonus_name').val() : '';
+	let person_name = $('#person_name').val() ? $('#person_name').val() : '';
+	let game_name = $('#game_name').val() ? $('#game_name').val() : '';
+	let status_name = $('#status_name').val() ? $('#status_name').val() : '';
+	let url = "{:url('admin/order/index')}".split('.html')[0];
+	
+	if( datemin ) url += '/datemin/' + datemin;
+	if( datemax ) url += '/datemax/' + datemax;
+	if( areainfo ) url += '/areainfo/' + areainfo;
+	if( bonus_name ) url += '/bonus_name/' + bonus_name;
+	if( person_name ) url += '/person_name/' + person_name;
+	if( game_name ) url += '/game_name/' + game_name;
+	if( status_name ) url += '/status_name/' + status_name;
+
+	$(location).attr('href',url);	
+}
+// console.log("{:url('admin/order/index')}".split('.html')[0])
+// console.log(location.pathname)
 
 </script>
