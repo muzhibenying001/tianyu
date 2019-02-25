@@ -37,7 +37,7 @@
 
 		<div class="row cl">
 			<div class="col-xs-4 col-sm-4 col-xs-offset-2 col-sm-offset-2">
-				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;修改&nbsp;&nbsp;" id="submit">
 			</div>
 		</div>
 	</form>
@@ -65,27 +65,60 @@
 		focusInvalid:true,
 		success:"valid",
         submitHandler:function(form){
-			$('#demoform').find('input').attr('readonly',true);
-			$('#demoform').find(':submit').attr('disabled',true);
         	/*发送ajax*/
 			$.ajax({
 				'url'	: '{:url("admin/AjaxApi/re_password")}',
 				'type'	: 'post',
 				'data'	: $('form').serializeArray(),
 				'dataType' : 'json',
+				'timeout'	: 10000,
+				'beforeSend': function(XHR){
+					$('#demoform').find('input').attr('readonly',true);
+					$('#submit').attr('disabled',true).val('正在登陆...');
+		    	},
 				'success'  : function(res){
 					if( res.code != 10000 ){
 						layer.msg(res.msg,{icon: 5,time:1000});
-						$('#demoform').find('input').attr('readonly',false);
-						$('#demoform').find(':submit').attr('disabled',false);
-						console.log($('#demoform').find(':submit'));
-						return;
+						return false;
 					}
-									
-					if( layer.msg(res.msg,{icon:1,time:3000}) ){
-						$(window).attr('location','{:url("admin/login/index")}');
-					}
-				}
+					
+					var FUNC=[
+						function() {
+							layer.msg('修改成功，请重新登陆', {icon:1,time:3000});
+							aniCB();
+						},
+						function() {
+							setInterval(function(){
+		                        $(location).attr('href', '{:url("admin/login/index")}');
+							},1000);
+						}
+					];  
+
+					var aniCB=function() {  
+						$(document).dequeue("myAnimation");  
+					}  
+					$(document).queue("myAnimation",FUNC);  
+					aniCB();
+				},
+				
+		    	'complete'	:function(){    			
+					$('#submit').attr('disabled',false).val('修改');
+					$('#demoform').find('input').attr('readonly',false);
+
+		    	},
+		    	'error'		: function(XMLHttpRequest, textStatus, errorThrown){
+		    		switch(textStatus){
+		    			case 'timeout':
+		    				layer.msg('连接超时，请检查网络', {icon: 2,time:1500});
+		    				break;
+		    			case 'error':
+		    				layer.msg(textStatus, {icon: 2,time:1500});
+		    				break;
+		    			default:
+		    				layer.msg('出错啦，请联系管理员处理！', {icon: 2,time:2000});
+		    				break;
+		    		}
+		    	}
 			});
 
         }

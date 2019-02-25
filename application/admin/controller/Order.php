@@ -650,8 +650,7 @@ Db::startTrans();
     }
 
     public function test(){
-        $data = request() -> param();
-        dump(date('Y-m-d',strtotime($data['datemin'])) );
+       phpinfo();
     }
 
 }
