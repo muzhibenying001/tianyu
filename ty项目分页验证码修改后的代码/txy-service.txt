@@ -1,0 +1,14 @@
+腾讯云服务器
+
+IP：188.131.183.164
+
+root yongyuan5471.
+ubuntu Zy12398700
+
+mysql 99c79cb902f84529c9a316e0310d1a49
+mysql远程 admin888
+
+
+#加盐方式
+$salt = 'asdfjl.+-soi/*,*1o34ukl2q349012..,';
+md5( md5($password) . md5($salt) );
