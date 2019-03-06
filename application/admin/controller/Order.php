@@ -82,7 +82,6 @@ class Order extends Base
         $about_game_name = isset($see_about['game_name']) && !empty($see_about['game_name']) ? intval($see_about['game_name']) : '';
         if( $about_game_name ) $see_about_where['o.gameid'] = ['=',$about_game_name];
         #查询模型
-        // $order = om::order('date desc,create_time desc') -> paginate(10);
         $order = om::alias('o')
             -> field('o.*,g.name game_name')
             -> join('games g','o.gameid=g.id','left')

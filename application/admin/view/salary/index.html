@@ -1,7 +1,5 @@
-
-
 <title>工资总览 - 工资管理 - H-ui.admin v3.0</title>
-
+<link rel="stylesheet" type="text/css" href="/lib/My97DatePicker/4.8/skin/WdatePicker.css" />
 
 <section class="Hui-article-box">
 	<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
@@ -12,14 +10,14 @@
 	<div class="Hui-article">
 		<article class="cl pd-20">
 			<div class="text-c"> 日期范围：
-				<input type="text" onfocus="" id="datemin" class="input-text Wdate" style="width:120px;">
+				<input type="text" id="datemin" name="datemin" class="input-text Wdate" autocomplete="off" style="width:120px;" value="{:date('Y-m-d',$datemin)}">
 				-
-				<input type="text" onfocus="" id="datemax" class="input-text Wdate" style="width:120px;">
-				<input type="text" class="input-text" style="width:250px" placeholder="输入管理员名称" id="" name="">
-				<button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜用户</button>
+				<input type="text" id="datemax" name="datemax" class="input-text Wdate" autocomplete="off" style="width:120px;" value="{:date('Y-m-d',$datemax)}">
+				<input type="text" class="input-text" style="width:250px" placeholder="输入需要查询的成员名称"autocomplete="off" name="member" value="{$member}" id="member">
+				<button type="button" class="btn btn-success" id="lookup" name=""><i class="Hui-iconfont">&#xe665;</i> 搜 索</button>
 			</div>
 			<div class="cl pd-5 bg-1 bk-gray mt-20">
-				<span class="r">共有数据：<strong>54</strong> 条</span>
+				<span class="r">共有数据：<strong>{:count($salary)}</strong> 条</span>
 			</div>
 			<table class="table table-border table-bordered table-bg">
 				<thead>
@@ -53,9 +51,19 @@
 		</article>
 	</div>
 </section>
-
+<script src="/static/admin/js/laydate.js"></script>
 <script type="text/javascript">
-
+	//执行一个laydate实例
+	var month = new Date();
+	laydate.render({
+	  elem: '#datemin', //指定元素
+	  max: 0
+	});
+	var month = new Date();
+	laydate.render({
+	  elem: '#datemax', //指定元素
+	  max: 0
+	});
 </script> 
 <!--/请在上方写此页面业务相关的脚本-->
 </body>

@@ -21,4 +21,5 @@ class Games extends Model
 
     	return $list;
     }
+
 }

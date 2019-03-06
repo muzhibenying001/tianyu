@@ -17,15 +17,27 @@ class Salary extends Base
      */
     public function index()
     {
+        #获取模糊查询参数
+        $see_about = request() -> param();
+        // dump($see_about);
+        $see_about_where = [];
+        #模糊查询最小时间
+        $datemin = isset($see_about['datemin']) && !empty($see_about['datemin']) ? strtotime($see_about['datemin']) : 1546185600;
+        #模糊查询最大时间
+        $datemax = isset($see_about['datemax']) && !empty($see_about['datemax']) ? strtotime($see_about['datemax']) : time();
+        #模糊查询成员名称
+        if($see_about['member'] = isset($see_about['member']) && !empty($see_about['member']) ? trim($see_about['member']) : '')
+            $see_about_where['m.nickname'] = ['like','%'.$see_about['member'].'%'];
         $salary = sm::alias('s')
             -> join('manager m','m.id=s.manager_id','inner')
             -> join('orderinfo o','o.id=s.order_id','inner')
             -> field('sum(s.salary) salary,count(s.salary) count,m.username,m.nickname,min(o.date) min,max(o.date) max')
             -> group('s.manager_id')
-            -> where('o.delete_time',null)
             -> order('salary desc,count desc')
+            -> where('o.delete_time','null')
+            -> where($see_about_where)
             -> select();
-        return view('index',['salary'=>$salary]);
+        return view('index',['salary'=>$salary,'datemin'=>$datemin,'datemax'=>$datemax,'member'=>$see_about['member']]);
     }
 
     /**
